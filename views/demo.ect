@@ -1,0 +1,263 @@
+<% extend 'layout' %>
+
+<h1><%= @title %></h1>
+
+<h2>ECDSA</h2>
+
+<div class="panel panel-default">
+  <div class="panel-heading">Sign Up</div>
+  <div class="panel-body">
+<form class="form-inline">
+  <div class="form-group">
+    <label class="sr-only" for="ecdsaName">Name</label>
+    <input type="text" class="form-control" id="ecdsaName" placeholder="Name">
+  </div>
+  <div class="form-group">
+    <label class="sr-only" for="ecdsaPass">Pass</label>
+    <input type="password" class="form-control" id="ecdsaPass" placeholder="Password">
+  </div>
+  <div class="form-group">
+    <label class="sr-only" for="ecdsaCurve">Curve</label>
+    <select class="form-control" id="ecdsaCurve">
+    <option value="secp256r1">secp256r1</option>
+    <option value="secp256k1">secp256k1</option>
+    <option value="secp384r1">secp384r1</option>
+    </select>
+  </div>
+  <button type="button" class="btn btn-primary" id="ecdsaSignup">Sign up</button>
+</form>
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading">Sign In</div>
+  <div class="panel-body">
+<form class="form-inline">
+  <div class="form-group">
+    <label class="sr-only" for="ecdsaName_in">Name</label>
+    <input type="text" class="form-control" id="ecdsaName_in" placeholder="Name">
+  </div>
+  <div class="form-group">
+    <label class="sr-only" for="ecdsaPass_in">Pass</label>
+    <input type="password" class="form-control" id="ecdsaPass_in" placeholder="Password">
+  </div>
+  <div class="form-group">
+    <label class="sr-only" for="ecdsaAlg">Alg</label>
+    <select class="form-control" id="ecdsaAlg">
+    <option value="SHA1withECDSA">SHA1withECDSA</option>
+    <option value="SHA256withECDSA">SHA256withECDSA</option>
+    <option value="SHA512withECDSA">SHA512withECDSA</option>
+    </select>
+  </div>
+  <button type="button" class="btn btn-default" id="ecdsaSignin">Sign in</button>
+</form>
+  </div>
+</div>
+<div class="panel panel-default">
+  <div class="panel-heading">Debug Information</div>
+  <div class="panel-body">
+<div class="form-group">
+<label for="ecdsaPubKey" class="control-label">pubkey(PKCS#8)</label>
+<textarea id="ecdsaPubkey" rows="5" class="form-control"></textarea>
+</div>
+<div class="form-group">
+<label for="ecdsaPrvKey" class="control-label">prvkey(PKCS#8)</label>
+<textarea id="ecdsaPrvkey" rows="5" class="form-control"></textarea>
+</div>
+<div class="form-group">
+<textarea id="ecdsaToken" rows="1" class="form-control"></textarea>
+</div>
+<div class="form-group">
+<textarea id="ecdsaSighex" rows="5" class="form-control"></textarea>
+</div>
+  </div>
+</div>
+
+<h2>RSA</h2>
+<div class="panel panel-default">
+  <div class="panel-heading">Sign Up</div>
+  <div class="panel-body">
+<form class="form-inline">
+  <div class="form-group">
+    <label class="sr-only" for="rsaName">Name</label>
+    <input type="text" class="form-control" id="rsaName" placeholder="Name">
+  </div>
+  <div class="form-group">
+    <label class="sr-only" for="rsaPass">Pass</label>
+    <input type="password" class="form-control" id="rsaPass" placeholder="Password">
+  </div>
+  <div class="form-group">
+    <label class="sr-only" for="rsaKeylen">Kelen</label>
+    <select class="form-control" id="rsaKeylen">
+    <option value="1024">1024</option>
+    <option value="2048">2048</option>
+    <option value="4096">4096</option>
+    </select>
+  </div>
+  <button type="button" class="btn btn-primary" id="rsaSignup">Sign up</button>
+</form>
+  </div>
+</div>
+<div class="panel panel-default">
+  <div class="panel-heading">Sign Up</div>
+  <div class="panel-body">
+<form class="form-inline">
+  <div class="form-group">
+    <label class="sr-only" for="rsaName_in">Name</label>
+    <input type="text" class="form-control" id="rsaName_in" placeholder="Name">
+  </div>
+  <div class="form-group">
+    <label class="sr-only" for="rsaPass_in">Pass</label>
+    <input type="password" class="form-control" id="rsaPass_in" placeholder="Password">
+  <div class="form-group">
+    <label class="sr-only" for="rsaAlg">Alg</label>
+    <select class="form-control" id="rsaAlg">
+    <option value="SHA1withRSA">SHA1withRSA</option>
+    <option value="SHA256withRSA">SHA256withRSA</option>
+    <option value="SHA512withRSA">SHA512withRSA</option>
+    </select>
+  </div>
+  <button type="button" class="btn btn-default" id="rsaSignin">Sign in</button>
+</form>
+  </div>
+</div>
+<div class="panel panel-default">
+  <div class="panel-heading">Debug Information</div>
+  <div class="panel-body">
+<div class="form-group">
+<label for="rsaPubKey" class="control-label">pubkey(PKCS#8)</label>
+<textarea id="rsaPubkey" cols="100" rows="5" class="form-control"></textarea>
+</div>
+<div class="form-group">
+<label for="rsaPrvKey" class="control-label">prvkey(PKCS#8)</label>
+<textarea id="rsaPrvkey" cols="100" rows="5" class="form-control"></textarea>
+</div>
+<div class="form-group">
+<textarea id="rsaToken" cols="100" rows="1" class="form-control"></textarea>
+</div>
+<div class="form-group">
+<textarea id="rsaSighex" cols="100" rows="5" class="form-control"></textarea>
+</div>
+<script type="text/javascript">
+$(function(){
+$('#rsaSignup').click(function(){
+	var name = $('#rsaName').val();
+	var pass = $('#rsaPass').val();
+	var keylen = $('#rsaKeylen').val();
+	var keypair = KEYUTIL.generateKeypair('RSA', keylen);
+	var pubKey = KEYUTIL.getPEM(keypair.pubKeyObj);
+	var prvKey = KEYUTIL.getPEM(keypair.prvKeyObj, 'PKCS8PRV');
+
+	signup(name,pass,pubKey,prvKey);
+
+	$('#rsaPubkey').text(pubKey);
+	$('#rsaPrvkey').text(prvKey);
+});
+
+$('#rsaSignin').click(function(){
+	var name = $('#rsaName_in').val();
+	var pass = $('#rsaPass_in').val();
+	var alg = $('#rsaAlg').val();
+	var prvkeyObj = $('#rsaPrvkey');
+	var tokenObj = $('#rsaToken');
+	var sighexObj = $('#rsaSighex');
+
+	signin(name,pass,alg,prvkeyObj,tokenObj,sighexObj);
+});
+
+$('#ecdsaSignup').click(function(){
+	var name = $('#ecdsaName').val();
+	var pass = $('#ecdsaPass').val();
+	var curve = $('#ecdsaCurve').val();
+	var keypair = KEYUTIL.generateKeypair('EC', curve);
+	var pubKey = KEYUTIL.getPEM(keypair.pubKeyObj);
+	var prvKey = KEYUTIL.getPEM(keypair.prvKeyObj, 'PKCS8PRV'); 
+
+	signup(name,pass,pubKey,prvKey);
+
+	$('#ecdsaPubkey').text(pubKey);
+	$('#ecdsaPrvkey').text(prvKey);
+});
+
+$('#ecdsaSignin').click(function(){
+	var name = $('#ecdsaName_in').val();
+	var pass = $('#ecdsaPass_in').val();
+	var alg = $('#ecdsaAlg').val();
+	var prvkeyObj = $('#ecdsaPrvkey');
+	var tokenObj = $('#ecdsaToken');
+	var sighexObj = $('#ecdsaSighex');
+
+	signin(name,pass,alg,prvkeyObj,tokenObj,sighexObj);
+});
+
+function signin(name,pass,alg,prvkeyObj,tokenObj,sighexObj){
+	var _prvKey = localStorage.getItem(name);
+	if(_prvKey == null ){
+		alert('prvkey is invalid');
+	}else{
+		var _pass = pass_hash(name,pass);
+		var prvKey = Base64.decode(_prvKey);
+		prvkeyObj.text(prvKey);
+
+		var token = get_token();
+		var msg = token + _pass;
+		tokenObj.text(msg);
+
+		var sig = new KJUR.crypto.Signature({"alg": alg});
+		sig.init(KEYUTIL.getKey(prvKey));
+		sig.updateString(msg);
+		var sigHex = sig.sign();
+		sighexObj.text(sigHex);
+
+		$.post('/signin', {
+			name: name,
+			sighex: sigHex,
+			token: token,
+			alg: alg
+		}, function(json){
+			alert(json.result);
+			if(json.result){
+				location.href = json.next;
+			}
+		});
+	}
+}
+
+function signup(name,pass,pubKey,prvKey){
+	$.post('signup', {
+		name : name,
+		pass : pass,
+		pubkey: Base64.encode(pubKey)
+	}, function(json){
+		if(json.err){
+			alert(json.err.message);
+		}else{
+			try{
+				localStorage.setItem(name,Base64.encode(prvKey));
+			}catch(e){
+				alert(e);
+			}
+		};
+	});
+}
+
+function pass_hash(name,pass){
+	var fixsalt = '5415231cd6ab37041ab9faacf828ee6ce31c9dcf981556687978496a753c6a57';
+	var salt = name + fixsalt;
+	var hash = '';
+	for(i = 0;i < 10; i = i + 1){
+		hash = CryptoJS.SHA256(hash + pass + salt).toString();
+	}
+	return hash;
+}
+
+function get_token(){
+	var randam = Math.floor(Math.random()*1000);
+	var date = new Date();
+	var value = randam + date.getTime();
+	var token = CryptoJS.SHA256(value).toString();
+	return token;
+}
+ 
+});
+</script>

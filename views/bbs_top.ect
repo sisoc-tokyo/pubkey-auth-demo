@@ -1,0 +1,20 @@
+<% extend 'layout' %>
+
+<br />
+<a href="/bbs/logout">Logout</a>
+<h1><%= @title %></h1>
+<p>Your Name: <%= @name %></p>
+<p><a href="/bbs/form/0">New Entry</a></p>
+<ul>
+<% for item in @items : %>
+  <li>
+  	<%= item.text %>
+	[ <%= item.name %> ]
+	<% if item.name == @name : %>
+  	<a href="/bbs/delete/<%= item._id %>">X</a>
+  	<a href="/bbs/form/<%= item._id %>">Modify</a>
+	<% end %>
+ 	<%= item.created %>
+ 	</li>
+<% end %>
+</ul>

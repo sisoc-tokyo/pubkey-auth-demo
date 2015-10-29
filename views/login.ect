@@ -1,0 +1,91 @@
+<% extend 'layout' %>
+
+<h1><%= @title %></h1>
+
+<div class="panel panel-default">
+  <div class="panel-heading">Login</div>
+  <div class="panel-body">
+<form class="form-inline">
+  <div class="form-group">
+    <label class="sr-only" for="ecdsaName_in">Name</label>
+    <input type="text" class="form-control" id="ecdsaName_in" placeholder="Name">
+  </div>
+  <div class="form-group">
+    <label class="sr-only" for="ecdsaPass_in">Pass</label>
+    <input type="password" class="form-control" id="ecdsaPass_in" placeholder="Password">
+  </div>
+  <input type="hidden" id="ecdsaAlg" value="SHA256withECDSA">
+  <button type="button" class="btn btn-default" id="ecdsaSignin">Login</button>
+</form>
+  </div>
+</div>
+
+<p><a href="/">Return</a></p>
+
+<script type="text/javascript">
+$(function(){
+$('#ecdsaSignin').click(function(){
+	var name = $('#ecdsaName_in').val();
+	var pass = $('#ecdsaPass_in').val();
+	var alg = $('#ecdsaAlg').val();
+	var prvkeyObj = $('#ecdsaPrvkey');
+	var tokenObj = $('#ecdsaToken');
+	var sighexObj = $('#ecdsaSighex');
+
+	signin(name,pass,alg,prvkeyObj,tokenObj,sighexObj);
+});
+
+function signin(name,pass,alg,prvkeyObj,tokenObj,sighexObj){
+	var _prvKey = localStorage.getItem(name);
+	if(_prvKey == null ){
+		alert('prvkey is invalid');
+	}else{
+		var _pass = pass_hash(name,pass);
+		var prvKey = Base64.decode(_prvKey);
+		prvkeyObj.text(prvKey);
+
+		var token = get_token();
+		var msg = token + _pass;
+		tokenObj.text(msg);
+
+		var sig = new KJUR.crypto.Signature({"alg": alg});
+		sig.init(KEYUTIL.getKey(prvKey));
+		sig.updateString(msg);
+		var sigHex = sig.sign();
+		sighexObj.text(sigHex);
+
+		$.post('/signin', {
+			name: name,
+			sighex: sigHex,
+			token: token,
+			alg: alg
+		}, function(json){
+			if(json.result){
+				location.href = json.next;
+			} else {
+        alert('login failed.');
+      }
+		});
+	}
+}
+
+function pass_hash(name,pass){
+	var fixsalt = '5415231cd6ab37041ab9faacf828ee6ce31c9dcf981556687978496a753c6a57';
+	var salt = name + fixsalt;
+	var hash = '';
+	for(i = 0;i < 10; i = i + 1){
+		hash = CryptoJS.SHA256(hash + pass + salt).toString();
+	}
+	return hash;
+}
+
+function get_token(){
+	var randam = Math.floor(Math.random()*1000);
+	var date = new Date();
+	var value = randam + date.getTime();
+	var token = CryptoJS.SHA256(value).toString();
+	return token;
+}
+
+});
+</script>

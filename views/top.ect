@@ -1,0 +1,57 @@
+<% extend 'layout' %>
+
+<h1><%= @title %></h1>
+
+<div class="panel panel-default">
+  <div class="panel-heading">Sign Up</div>
+  <div class="panel-body">
+<form class="form-inline">
+  <div class="form-group">
+    <label class="sr-only" for="ecdsaName">Name</label>
+    <input type="text" class="form-control" id="ecdsaName" placeholder="Name">
+  </div>
+  <div class="form-group">
+    <label class="sr-only" for="ecdsaPass">Pass</label>
+    <input type="password" class="form-control" id="ecdsaPass" placeholder="Password">
+  </div>
+  <input type="hidden" id="ecdsaCurve" value="secp256r1">
+  <button type="button" class="btn btn-primary" id="ecdsaSignup">Sign up</button>
+</form>
+  </div>
+</div>
+
+<p><a href="/login">Login</a></p>
+
+<script type="text/javascript">
+$(function(){
+$('#ecdsaSignup').click(function(){
+	var name = $('#ecdsaName').val();
+	var pass = $('#ecdsaPass').val();
+	var curve = $('#ecdsaCurve').val();
+	var keypair = KEYUTIL.generateKeypair('EC', curve);
+	var pubKey = KEYUTIL.getPEM(keypair.pubKeyObj);
+	var prvKey = KEYUTIL.getPEM(keypair.prvKeyObj, 'PKCS8PRV');
+
+	signup(name,pass,pubKey,prvKey);
+});
+
+function signup(name,pass,pubKey,prvKey){
+	$.post('signup', {
+		name : name,
+		pass : pass,
+		pubkey: Base64.encode(pubKey)
+	}, function(json){
+		if(json.err){
+			alert(json.err.message);
+		}else{
+			try{
+				localStorage.setItem(name,Base64.encode(prvKey));
+        alert('Success!');
+			}catch(e){
+				alert(e);
+			}
+		};
+	});
+}
+});
+</script>
