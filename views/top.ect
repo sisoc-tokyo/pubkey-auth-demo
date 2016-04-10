@@ -22,15 +22,23 @@
 
 <p><a href="/login">Login</a></p>
 
+<p id="res"></p>
+
 <script type="text/javascript">
 $(function(){
 $('#ecdsaSignup').click(function(){
 	var name = $('#ecdsaName').val();
 	var pass = $('#ecdsaPass').val();
 	var curve = $('#ecdsaCurve').val();
+	var startTime = new Date();
 	var keypair = KEYUTIL.generateKeypair('EC', curve);
+	var endTime = new Date();
 	var pubKey = KEYUTIL.getPEM(keypair.pubKeyObj);
-	var prvKey = KEYUTIL.getPEM(keypair.prvKeyObj, 'PKCS8PRV');
+	var prvKey = KEYUTIL.getPEM(keypair.prvKeyObj, 'PKCS8PRV', pass);
+
+	// $('#res').append('<pre>' + pubKey  + prvKey + '</pre>');
+
+	$('#res').append($('#ecdsaName').val() + " generateKeyPair: " + (endTime - startTime) + "ms&nbsp;");
 
 	signup(name,pass,pubKey,prvKey);
 });
@@ -42,15 +50,16 @@ function signup(name,pass,pubKey,prvKey){
 		pubkey: Base64.encode(pubKey)
 	}, function(json){
 		if(json.err){
-			alert(json.err.message);
+			$('#res').append(json.err.message);
 		}else{
 			try{
 				localStorage.setItem(name,Base64.encode(prvKey));
-        alert('Success!');
+				$('#res').append('Success!');
 			}catch(e){
-				alert(e);
+				$('#res').append(e);
 			}
 		};
+		$('#res').append('<br />');
 	});
 }
 });

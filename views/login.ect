@@ -22,37 +22,38 @@
 
 <p><a href="/">Return</a></p>
 
+<p id="res"></p>
+
 <script type="text/javascript">
 $(function(){
 $('#ecdsaSignin').click(function(){
 	var name = $('#ecdsaName_in').val();
 	var pass = $('#ecdsaPass_in').val();
 	var alg = $('#ecdsaAlg').val();
-	var prvkeyObj = $('#ecdsaPrvkey');
-	var tokenObj = $('#ecdsaToken');
-	var sighexObj = $('#ecdsaSighex');
 
-	signin(name,pass,alg,prvkeyObj,tokenObj,sighexObj);
+	signin(name,pass,alg);
 });
 
-function signin(name,pass,alg,prvkeyObj,tokenObj,sighexObj){
+function signin(name,pass,alg){
 	var _prvKey = localStorage.getItem(name);
 	if(_prvKey == null ){
-		alert('prvkey is invalid');
+		$('#res').append('prvkey is invalid');
 	}else{
+		var startTime = new Date();
 		var _pass = pass_hash(name,pass);
 		var prvKey = Base64.decode(_prvKey);
-		prvkeyObj.text(prvKey);
 
 		var token = get_token();
 		var msg = token + _pass;
-		tokenObj.text(msg);
 
 		var sig = new KJUR.crypto.Signature({"alg": alg});
-		sig.init(KEYUTIL.getKey(prvKey));
+		var prvKeyObj = KEYUTIL.getKey(prvKey, pass);
+		sig.init(prvKeyObj);
 		sig.updateString(msg);
 		var sigHex = sig.sign();
-		sighexObj.text(sigHex);
+		var endTime = new Date();
+
+		$('#res').append($('#ecdsaName_in').val() + " sign: " + (endTime - startTime) + "ms&nbsp;");
 
 		$.post('/signin', {
 			name: name,
@@ -61,10 +62,12 @@ function signin(name,pass,alg,prvkeyObj,tokenObj,sighexObj){
 			alg: alg
 		}, function(json){
 			if(json.result){
-				location.href = json.next;
+				// location.href = json.next;
+				$('#res').append('<a href="' + json.next  + '">next</a>');
 			} else {
-        alert('login failed.');
-      }
+				$('#res').append('login failed.');
+			}
+			$('#res').append('<br />');
 		});
 	}
 }
