@@ -1,7 +1,8 @@
 <% extend 'layout' %>
 
 <br />
-<a href="/bbs/logout">Logout</a>
+<p><a href="/bbs/logout">Logout</a></p>
+<p><a id="exportprvkey" href="#" download="export.pem" onclick="exportPrvkey()">Export private key</a></p>
 <h1><%= @title %></h1>
 <p>Your Name: <%= @name %></p>
 <p><a href="/bbs/form/0">New Entry</a></p>
@@ -18,3 +19,16 @@
  	</li>
 <% end %>
 </ul>
+<script type="text/javascript">
+function exportPrvkey(){
+	var name = "<%= @name %>";
+	var prvkey = Base64.decode(localStorage.getItem(name));
+	var blob = new Blob([ prvkey ], { "type" : "text/plain" });
+	if (window.navigator.msSaveBlob) {
+		window.navigator.msSaveBlob(blob, "export.pem");
+		window.navigator.msSaveOrOpenBlob(blob, "export.pem");
+	} else {
+		document.getElementById("exportprvkey").href = window.URL.createObjectURL(blob);
+	}
+}
+</script>
